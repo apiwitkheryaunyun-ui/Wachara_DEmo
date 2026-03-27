@@ -15,15 +15,21 @@ class AdminUserSeeder extends Seeder
         $email = env('ADMIN_EMAIL', 'admin@example.com');
         $password = env('ADMIN_PASSWORD', 'ChangeMeNow123!');
 
-        User::updateOrCreate(
-            ['username' => $username],
-            [
-                'name' => $name,
-                'email' => $email,
-                'password' => Hash::make($password),
-                'role' => 'admin',
-                'is_active' => true,
-            ]
-        );
+        $user = User::query()
+            ->where('username', $username)
+            ->orWhere('email', $email)
+            ->first();
+
+        if (!$user) {
+            $user = new User();
+        }
+
+        $user->username = $username;
+        $user->name = $name;
+        $user->email = $email;
+        $user->password = Hash::make($password);
+        $user->role = 'admin';
+        $user->is_active = true;
+        $user->save();
     }
 }
